@@ -10,9 +10,12 @@ export function SiteFooter() {
             <Music2 className="h-4 w-4 text-primary" />
           </div>
           <span className="font-medium gradient-text">Orphia</span>
-          <span className="text-sm text-muted-foreground">
+          <Link
+            href="/license"
+            className="text-sm text-muted-foreground hover:text-primary hover:underline transition-colors"
+          >
             © {new Date().getFullYear()}
-          </span>
+          </Link>
         </div>
         <nav className="flex flex-wrap items-center gap-4 text-sm">
           <Link
@@ -36,20 +39,20 @@ export function SiteFooter() {
         </nav>
         <div className="flex gap-3">
           <Link
-            href="https://github.com/aarabii/Orphia-AI-Music-Generator"
+            href="https://github.com/aarabii/orphia-ai-music-generator/"
             target="_blank"
             rel="noopener noreferrer"
           >
             <Github className="h-5 w-5 text-muted-foreground hover:text-primary transition-colors" />
           </Link>
           <Link
-            href="https://twitter.com"
+            href="https://twitter.com/orphiamusic"
             target="_blank"
             rel="noopener noreferrer"
           >
             <Twitter className="h-5 w-5 text-muted-foreground hover:text-primary transition-colors" />
           </Link>
-          <Link href="mailto:aarab.nishchal@gmail.com">
+          <Link href="mailto:contact@orphia.com">
             <Mail className="h-5 w-5 text-muted-foreground hover:text-primary transition-colors" />
           </Link>
         </div>

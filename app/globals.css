@@ -10,7 +10,7 @@
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
-    --primary: 47 95% 57%; /* Vibrant yellow */
+    --primary: 46.98 100% 59%; /* Vibrant yellow */
     --primary-foreground: 240 5.9% 10%;
     --secondary: 326 100% 60%; /* Fuchsia */
     --secondary-foreground: 0 0% 100%;
@@ -25,10 +25,6 @@
     --ring: 47 95% 57%;
     --radius: 1rem;
   }
-}
-
-* {
-  scrollbar-width: none;
 }
 
 @layer base {
@@ -122,4 +118,25 @@
 .sidebar-expanded .sidebar-item-text {
   opacity: 1;
   transform: translateX(0);
+}
+
+/* Responsive fixes */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Fix for content overflow */
+.overflow-x-hidden {
+  overflow-x: hidden;
+}
+
+/* Ensure content is properly padded on mobile */
+@media (max-width: 640px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 }

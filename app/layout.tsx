@@ -10,6 +10,7 @@ export const metadata: Metadata = {
   title: "Orphia - AI Music Generator",
   description:
     "Generate unique music with just a prompt using AI powered by neural networks",
+  icons: "/icon.svg",
 };
 
 export default function RootLayout({

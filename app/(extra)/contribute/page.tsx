@@ -19,6 +19,25 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export default function ContributePage() {
+  // Prepare share content
+  const shareTitle = "Check out Orphia - AI-powered music generation!";
+  const shareText =
+    "I just discovered Orphia, an amazing AI tool that generates music from text prompts or audio samples. Check it out!";
+  const shareUrl = "https://orphia.com";
+
+  // Create share URLs
+  const twitterShareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+    shareText
+  )}&url=${encodeURIComponent(shareUrl)}`;
+  const linkedinShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
+    shareUrl
+  )}&title=${encodeURIComponent(shareTitle)}&summary=${encodeURIComponent(
+    shareText
+  )}`;
+  const emailShareUrl = `mailto:?subject=${encodeURIComponent(
+    shareTitle
+  )}&body=${encodeURIComponent(shareText + "\n\n" + shareUrl)}`;
+
   return (
     <div className="container py-8">
       <div className="space-y-8 max-w-4xl mx-auto">
@@ -51,13 +70,13 @@ export default function ContributePage() {
               icon: <Github className="h-8 w-8 text-accent" />,
               title: "Contribute Code",
               description: "Help us improve the model or web application.",
-              link: "https://github.com",
+              link: "https://github.com/aarabii/orphia-ai-music-generator/",
             },
             {
               icon: <MessagesSquare className="h-8 w-8 text-primary" />,
               title: "Join Discussions",
               description: "Participate in our community discussions.",
-              link: "https://discord.com",
+              link: "https://discord.gg/orphia",
             },
           ].map((item, index) => (
             <motion.div
@@ -81,7 +100,19 @@ export default function ContributePage() {
                     {item.description}
                   </p>
                   <Button asChild className="rounded-full">
-                    <a href={item.link}>Get Started</a>
+                    <a
+                      href={item.link}
+                      target={
+                        item.link.startsWith("http") ? "_blank" : undefined
+                      }
+                      rel={
+                        item.link.startsWith("http")
+                          ? "noopener noreferrer"
+                          : undefined
+                      }
+                    >
+                      Get Started
+                    </a>
                   </Button>
                 </CardContent>
               </Card>
@@ -106,25 +137,42 @@ export default function ContributePage() {
                   variant="outline"
                   size="sm"
                   className="rounded-full border-primary/20 hover:bg-primary/10 hover:text-primary"
+                  asChild
                 >
-                  <Twitter className="h-4 w-4 mr-2" />
-                  Share on Twitter
+                  <a
+                    href={twitterShareUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Twitter className="h-4 w-4 mr-2" />
+                    Share on Twitter
+                  </a>
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   className="rounded-full border-secondary/20 hover:bg-secondary/10 hover:text-secondary"
+                  asChild
                 >
-                  <Linkedin className="h-4 w-4 mr-2" />
-                  Share on LinkedIn
+                  <a
+                    href={linkedinShareUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Linkedin className="h-4 w-4 mr-2" />
+                    Share on LinkedIn
+                  </a>
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   className="rounded-full border-accent/20 hover:bg-accent/10 hover:text-accent"
+                  asChild
                 >
-                  <Mail className="h-4 w-4 mr-2" />
-                  Share via Email
+                  <a href={emailShareUrl}>
+                    <Mail className="h-4 w-4 mr-2" />
+                    Share via Email
+                  </a>
                 </Button>
               </div>
             </div>

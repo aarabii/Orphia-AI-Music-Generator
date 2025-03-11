@@ -51,7 +51,7 @@ export default function LandingPage() {
             >
               <div className="relative">
                 <motion.div
-                  className="absolute -inset-10 rounded-full opacity-30 blur-xl bg-white"
+                  className="absolute -inset-10 rounded-full opacity-30 blur-md bg-white"
                   animate={{
                     scale: [1, 1.2, 1],
                     opacity: [0.3, 0.5, 0.3],
@@ -62,7 +62,14 @@ export default function LandingPage() {
                     repeatType: "reverse",
                   }}
                 />
-                <Music2 className="relative mx-auto h-20 w-20 text-white" />
+                {/* <Music2 className="relative mx-auto h-20 w-20 text-white" /> */}
+                <Image
+                  src="/icon.svg"
+                  alt="icon"
+                  width={200}
+                  height={200}
+                  className="relative mx-auto"
+                />
               </div>
               <motion.h1
                 initial={{ y: 20, opacity: 0 }}

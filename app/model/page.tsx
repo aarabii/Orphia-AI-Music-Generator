@@ -96,7 +96,7 @@ export default function ModelPage() {
                 </Button>
                 <Button className="gap-2 rounded-full" asChild>
                   <Link
-                    href="https://github.com"
+                    href="https://github.com/aarabii/orphia-ai-music-generator/"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
