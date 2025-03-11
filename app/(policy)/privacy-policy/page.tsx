@@ -23,7 +23,7 @@ export default function PrivacyPolicyPage() {
           <p className="text-muted-foreground">Last updated: March 11, 2025</p>
         </div>
 
-        <div className="prose prose-gray max-w-none dark:prose-invert">
+        <div className="prose prose-gray max-w-none">
           <p>
             At Orphia, we take your privacy seriously. This Privacy Policy
             explains how we collect, use, disclose, and safeguard your

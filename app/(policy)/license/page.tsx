@@ -46,7 +46,7 @@ export default function LicensePage() {
           </Button>
         </div>
 
-        <div className="prose prose-gray max-w-none dark:prose-invert">
+        <div className="prose prose-gray max-w-none">
           <div className="bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5 p-6 rounded-lg border border-primary/10">
             <pre className="text-sm whitespace-pre-wrap font-mono text-foreground">
               {`
