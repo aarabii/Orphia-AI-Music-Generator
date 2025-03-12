@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Github, Linkedin, Mail, Twitter } from "lucide-react";
+import { Github, Linkedin, Mail, MailIcon } from "lucide-react";
 import { motion } from "framer-motion";
 
 import { Card, CardContent } from "@/components/ui/card";
@@ -45,6 +45,7 @@ export default function TeamPage() {
                       <Image
                         src={member.image || "/placeholder.svg"}
                         alt={member.name}
+                        loading="lazy"
                         fill
                         className="object-cover transition-transform duration-500"
                         style={{
@@ -102,7 +103,7 @@ export default function TeamPage() {
                         </Button>
                       </Link>
                       <Link
-                        href={member.twitter}
+                        href={`mailto:${member.mail}`}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
@@ -111,22 +112,8 @@ export default function TeamPage() {
                           variant="ghost"
                           className="h-8 w-8 rounded-full bg-accent/10 text-accent hover:bg-accent/20 hover:text-accent"
                         >
-                          <Twitter className="h-4 w-4" />
+                          <MailIcon className="h-4 w-4" />
                           <span className="sr-only">Twitter</span>
-                        </Button>
-                      </Link>
-                      <Link
-                        href={`mailto:${member.name
-                          .toLowerCase()
-                          .replace(" ", ".")}@orphia.com`}
-                      >
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="h-8 w-8 rounded-full bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary"
-                        >
-                          <Mail className="h-4 w-4" />
-                          <span className="sr-only">Email</span>
                         </Button>
                       </Link>
                     </div>
