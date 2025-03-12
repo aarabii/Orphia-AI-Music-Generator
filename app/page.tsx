@@ -3,22 +3,28 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { AnimatePresence, motion } from "framer-motion";
 import {
-  Music2,
-  Upload,
-  Sparkles,
-  Wand2,
-  Headphones,
-  Zap,
-  PlayCircle,
-} from "lucide-react";
+  AnimatePresence,
+  motion,
+  useScroll,
+  useTransform,
+} from "framer-motion";
+import { Upload, Sparkles, Wand2, Headphones, Zap } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
+import LandingPageImage from "@/assets/image/landingImage.jpeg";
+import { MagicCard } from "@/components/magicui/magic-card";
+import { Particles } from "@/components/magicui/particles";
+import { TypingAnimation } from "@/components/magicui/typing-animation";
+import { HyperText } from "@/components/magicui/hyper-text";
+
 export default function LandingPage() {
+  const { scrollYProgress } = useScroll();
   const [showAnimation, setShowAnimation] = useState(true);
+
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.9]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -114,20 +120,31 @@ export default function LandingPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
-                    className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none"
+                    className="text-5xl font-bold tracking-tighter"
                   >
-                    Create Music with <br />
-                    <span className="text-primary">AI-Powered</span> Magic
+                    <span className="text-7xl">Orphia</span>
+                    <br />
+                    <span className="text-secondary/80">
+                      <HyperText>Think it,</HyperText>
+                    </span>{" "}
+                    <span className="text-primary/80">
+                      <HyperText>Prompt it,</HyperText>
+                    </span>{" "}
+                    <span className="text-accent/80">
+                      <HyperText>Create it.</HyperText>
+                    </span>
                   </motion.h1>
                   <motion.p
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2, duration: 0.5 }}
-                    className="max-w-[600px] text-muted-foreground md:text-xl"
+                    className="max-w-[600px] text-muted-foreground text-lg"
                   >
-                    Inspired by Orpheus, the legendary musician of Greek
-                    mythology. Create unique music with just a prompt or from a
-                    sample.
+                    <TypingAnimation>
+                      Inspired by Orpheus, the legendary musician of Greek
+                      mythology. Create unique music with just a prompt or from
+                      a sample.
+                    </TypingAnimation>
                   </motion.p>
                 </div>
                 <motion.div
@@ -161,22 +178,32 @@ export default function LandingPage() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.2, duration: 0.5 }}
-                className="mx-auto flex items-center justify-center lg:order-last"
+                className="mx-auto flex items-center justify-center lg:order-last relative"
               >
-                <div className="relative">
-                  <Image
-                    src="/placeholder.svg?height=400&width=400"
-                    alt="Music visualization"
-                    width={400}
-                    height={400}
-                    className="rounded-2xl shadow-lg"
-                  />
-                  <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-primary/20 rounded-full blur-xl"></div>
-                  <div className="absolute -top-6 -left-6 w-24 h-24 bg-secondary/20 rounded-full blur-xl"></div>
-                </div>
+                <motion.div style={{ scale }}>
+                  <div className="relative">
+                    <Image
+                      src={LandingPageImage.src}
+                      alt="Music visualization"
+                      width={400}
+                      height={400}
+                      className="rounded-2xl shadow-2xl"
+                    />
+                    {/* Blurred colored elements to create depth */}
+                    <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 w-64 h-16 bg-primary/20 rounded-full blur-xl"></div>
+                    <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 w-48 h-12 bg-secondary/20 rounded-full blur-2xl"></div>
+                  </div>
+                </motion.div>
               </motion.div>
             </div>
           </div>
+          <Particles
+            className="absolute inset-0 z-0 opacity-50"
+            quantity={150}
+            ease={80}
+            color="accent"
+            refresh
+          />
         </section>
 
         <section className="w-full py-12 md:py-24 lg:py-32 relative overflow-hidden">
@@ -184,7 +211,7 @@ export default function LandingPage() {
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
-                <div className="inline-block rounded-full px-3 py-1 text-sm bg-primary/10 text-primary mb-2">
+                <div className="inline-block rounded-full px-3 py-1 text-sm bg-primary/20 text-accent/80 border-2 border-secondary/40 mb-2">
                   <Wand2 className="h-4 w-4 inline-block mr-1" />
                   How It Works
                 </div>
@@ -230,15 +257,17 @@ export default function LandingPage() {
                   viewport={{ once: true }}
                 >
                   <Card className="border-primary/10 overflow-hidden h-full">
-                    <CardContent className="flex flex-col items-center p-6 text-center">
-                      <div className={`mb-4 rounded-full ${item.color} p-3`}>
-                        {item.icon}
-                      </div>
-                      <h3 className="text-xl font-bold">{item.title}</h3>
-                      <p className="text-muted-foreground">
-                        {item.description}
-                      </p>
-                    </CardContent>
+                    <MagicCard gradientOpacity={0.8}>
+                      <CardContent className="flex flex-col items-center p-6 text-center">
+                        <div className={`mb-4 rounded-full ${item.color} p-3`}>
+                          {item.icon}
+                        </div>
+                        <h3 className="text-xl font-bold">{item.title}</h3>
+                        <p className="text-muted-foreground">
+                          {item.description}
+                        </p>
+                      </CardContent>
+                    </MagicCard>
                   </Card>
                 </motion.div>
               ))}
