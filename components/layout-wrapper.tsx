@@ -4,9 +4,10 @@ import type React from "react";
 
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { SiteHeader } from "@/components/site-header";
-import { SiteFooter } from "@/components/site-footer";
-import { SideNav } from "@/components/side-nav";
+
+import { SiteHeader } from "@/components/header";
+import { SiteFooter } from "@/components/footer";
+import { SideNav } from "@/components/nav";
 
 interface LayoutWrapperProps {
   children: React.ReactNode;
@@ -17,7 +18,6 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
   const [isMounted, setIsMounted] = useState(false);
   const isLandingPage = pathname === "/";
 
-  // Prevent hydration mismatch
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -26,7 +26,6 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
     return null;
   }
 
-  // Use top navigation for landing page, side navigation for other pages
   if (isLandingPage) {
     return (
       <div className="flex min-h-screen flex-col">

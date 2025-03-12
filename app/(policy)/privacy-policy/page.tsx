@@ -206,10 +206,7 @@ export default function PrivacyPolicyPage() {
           </p>
 
           <p className="mt-4">
-            <strong>Email:</strong> privacy@orphia.com
-            <br />
-            <strong>Address:</strong> Orphia Inc., 123 Music Lane, San
-            Francisco, CA 94103
+            <strong>Email:</strong> aarab.nishchal@gmail.com
           </p>
         </div>
       </motion.div>

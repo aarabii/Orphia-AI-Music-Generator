@@ -60,7 +60,7 @@ export default function FAQPage() {
           </p>
           <div className="flex justify-center gap-4">
             <a
-              href="mailto:support@orphia.com"
+              href="mailto:aarab.nishchal@gmail.com"
               className="inline-flex items-center justify-center rounded-full text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-primary text-primary-foreground hover:bg-primary/90 h-10 py-2 px-4"
             >
               Contact Support

@@ -42,6 +42,8 @@ export function SideNav() {
       } else {
         setIsExpanded(true);
       }
+
+      return isMobile;
     };
 
     // Initial check
@@ -157,9 +159,9 @@ export function SideNav() {
                     <Link
                       href={item.href}
                       className={cn(
-                        "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-foreground",
+                        "flex items-center gap-3 rounded-md px-3 py-2 text-muted-foreground transition-all hover:text-foreground",
                         item.href === pathname &&
-                          "bg-primary/10 text-primary font-medium"
+                          "bg-primary/10 text-secondary font-medium border-2 border-accent hover:text-secondary/80"
                       )}
                     >
                       {item.icon}
