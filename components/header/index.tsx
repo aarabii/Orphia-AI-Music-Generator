@@ -2,18 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Menu,
-  Home,
-  Sparkles,
-  Upload,
-  Users,
-  BrainCircuit,
-  HeartHandshake,
-  HelpCircle,
-  Shield,
-  FileText,
-} from "lucide-react";
+import { Menu } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -30,6 +19,10 @@ import { SignInButton, UserButton } from "@clerk/nextjs";
 import { useConvexAuth } from "convex/react";
 import { Spinner } from "../spinner";
 import { Fragment } from "react";
+import { navItems, bottomNavItems } from "@/constants/header-values";
+import { LandingPageNav } from "./LandingaPageNav";
+import { LandingPageSideNavTop } from "./LandingPageSideNavTop";
+import { UserAvatar } from "../user-avatar";
 
 interface SiteHeaderProps {
   showMobileOnly?: boolean;
@@ -39,45 +32,6 @@ export function SiteHeader({ showMobileOnly = false }: SiteHeaderProps) {
   const pathname = usePathname();
   const isLandingPage = pathname === "/";
   const { isAuthenticated, isLoading } = useConvexAuth();
-
-  const navItems = [
-    { href: "/", label: "Home", icon: <Home className="h-5 w-5" /> },
-    {
-      href: "/create/prompt",
-      label: "Create with Prompt",
-      icon: <Sparkles className="h-5 w-5" />,
-    },
-    {
-      href: "/create/sample",
-      label: "Upload Sample",
-      icon: <Upload className="h-5 w-5" />,
-    },
-    { href: "/team", label: "Our Team", icon: <Users className="h-5 w-5" /> },
-    {
-      href: "/model",
-      label: "Our Model",
-      icon: <BrainCircuit className="h-5 w-5" />,
-    },
-    {
-      href: "/contribute",
-      label: "Contribute",
-      icon: <HeartHandshake className="h-5 w-5" />,
-    },
-  ];
-
-  const bottomNavItems = [
-    { href: "/faq", label: "FAQ", icon: <HelpCircle className="h-5 w-5" /> },
-    {
-      href: "/privacy-policy",
-      label: "Privacy Policy",
-      icon: <Shield className="h-5 w-5" />,
-    },
-    {
-      href: "/terms-of-service",
-      label: "Terms of Service",
-      icon: <FileText className="h-5 w-5" />,
-    },
-  ];
 
   return (
     <header
@@ -101,29 +55,7 @@ export function SiteHeader({ showMobileOnly = false }: SiteHeaderProps) {
             </div>
             <span className="font-bold text-lg gradient-text">Orphia</span>
           </Link>
-          {isLandingPage && (
-            <nav className="hidden gap-6 md:flex">
-              {[
-                { href: "/", label: "Home" },
-                { href: "/create/prompt", label: "Create with Prompt" },
-                { href: "/create/sample", label: "Upload Sample" },
-                { href: "/team", label: "Our Team" },
-                { href: "/model", label: "Our Model" },
-                { href: "/contribute", label: "Contribute" },
-              ].map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    "flex items-center text-sm font-medium text-muted-foreground transition-colors hover:text-foreground",
-                    item.href === pathname && "text-foreground"
-                  )}
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
-          )}
+          {isLandingPage && <LandingPageNav pathnameValue={pathname} />}
         </div>
         <div className="flex flex-1 items-center justify-end space-x-4">
           <nav className="flex items-center space-x-2">
@@ -192,23 +124,7 @@ export function SiteHeader({ showMobileOnly = false }: SiteHeaderProps) {
                 </SheetHeader>
                 <ScrollArea className="h-[calc(100vh-5rem)]">
                   <div className="flex flex-col h-full justify-between">
-                    <div className="grid gap-2 py-6 pr-6">
-                      {navItems.map((item) => (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          className={cn(
-                            "flex w-full items-center gap-2 rounded-lg py-2 text-lg font-medium",
-                            item.href === pathname
-                              ? "text-primary"
-                              : "text-muted-foreground"
-                          )}
-                        >
-                          {item.icon}
-                          {item.label}
-                        </Link>
-                      ))}
-                    </div>
+                    <LandingPageSideNavTop pathnameValue={pathname} />
 
                     <div className="mt-auto">
                       <div className="grid gap-2 py-6 pr-6 border-t pt-6">
@@ -229,6 +145,9 @@ export function SiteHeader({ showMobileOnly = false }: SiteHeaderProps) {
                         ))}
                       </div>
                     </div>
+                  </div>
+                  <div className="py-4 pr-8 border-t">
+                    <UserAvatar />
                   </div>
                 </ScrollArea>
               </SheetContent>

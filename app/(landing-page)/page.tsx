@@ -187,6 +187,8 @@ export default function LandingPage() {
                       alt="Music visualization"
                       width={400}
                       height={400}
+                      placeholder="empty"
+                      priority
                       className="rounded-2xl shadow-2xl"
                     />
                     {/* Blurred colored elements to create depth */}

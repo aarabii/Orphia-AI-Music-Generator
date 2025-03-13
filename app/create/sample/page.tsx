@@ -1,49 +1,91 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { FileAudio, Info, Loader2, Music2, PlayCircle, Upload, Wand2, Zap } from "lucide-react"
+import { useState } from "react";
+import {
+  FileAudio,
+  Info,
+  Loader2,
+  Music2,
+  PlayCircle,
+  Upload,
+  Wand2,
+  Zap,
+} from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Slider } from "@/components/ui/slider"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Slider } from "@/components/ui/slider";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useConvexAuth } from "convex/react";
+import { Spinner } from "@/components/spinner";
+import { redirect } from "next/navigation";
 
 export default function SamplePage() {
-  const [fileName, setFileName] = useState("")
-  const [isUploaded, setIsUploaded] = useState(false)
-  const [prompt, setPrompt] = useState("")
-  const [isGenerating, setIsGenerating] = useState(false)
-  const [generatedMusic, setGeneratedMusic] = useState(false)
+  const { isAuthenticated, isLoading } = useConvexAuth();
+
+  const [fileName, setFileName] = useState("");
+  const [isUploaded, setIsUploaded] = useState(false);
+  const [prompt, setPrompt] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedMusic, setGeneratedMusic] = useState(false);
+
+  if (isLoading) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return redirect("/");
+  }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFileName(e.target.files[0].name)
-      setIsUploaded(true)
+      setFileName(e.target.files[0].name);
+      setIsUploaded(true);
     }
-  }
+  };
 
   const handleGenerate = () => {
-    if (!isUploaded) return
+    if (!isUploaded) return;
 
-    setIsGenerating(true)
+    setIsGenerating(true);
 
     // Simulate music generation
     setTimeout(() => {
-      setIsGenerating(false)
-      setGeneratedMusic(true)
-    }, 3000)
-  }
+      setIsGenerating(false);
+      setGeneratedMusic(true);
+    }, 3000);
+  };
 
   return (
     <div className="container py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight mb-2 gradient-text">Upload Sample</h1>
-        <p className="text-muted-foreground">Upload an audio sample and let AI extend it or transform it.</p>
+        <h1 className="text-3xl font-bold tracking-tight mb-2 gradient-text">
+          Upload Sample
+        </h1>
+        <p className="text-muted-foreground">
+          Upload an audio sample and let AI extend it or transform it.
+        </p>
       </div>
 
       <div className="grid gap-8 md:grid-cols-[1fr_350px]">
@@ -54,7 +96,9 @@ export default function SamplePage() {
                 <FileAudio className="mr-2 h-5 w-5 text-primary" />
                 Audio Sample
               </CardTitle>
-              <CardDescription>Upload an audio file to use as a basis for your generation</CardDescription>
+              <CardDescription>
+                Upload an audio file to use as a basis for your generation
+              </CardDescription>
             </CardHeader>
             <CardContent className="pt-6">
               {!isUploaded ? (
@@ -63,8 +107,12 @@ export default function SamplePage() {
                     <div className="absolute inset-0 rounded-full bg-primary/10 animate-pulse"></div>
                     <Upload className="h-8 w-8 text-primary absolute inset-0 m-auto" />
                   </div>
-                  <h3 className="text-lg font-medium mb-2">Upload your audio</h3>
-                  <p className="text-sm text-muted-foreground mb-4">Drag and drop or click to browse</p>
+                  <h3 className="text-lg font-medium mb-2">
+                    Upload your audio
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Drag and drop or click to browse
+                  </p>
                   <Input
                     type="file"
                     accept="audio/*"
@@ -75,16 +123,24 @@ export default function SamplePage() {
                   <Button asChild variant="secondary" className="rounded-full">
                     <label htmlFor="audio-upload">Choose file</label>
                   </Button>
-                  <p className="text-xs text-muted-foreground mt-4">MP3, WAV, or AIFF, max 10MB</p>
+                  <p className="text-xs text-muted-foreground mt-4">
+                    MP3, WAV, or AIFF, max 10MB
+                  </p>
                 </div>
               ) : (
                 <div className="rounded-md border p-4 bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5">
                   <div className="flex justify-between items-center mb-4">
                     <div>
                       <h3 className="font-medium">{fileName}</h3>
-                      <p className="text-sm text-muted-foreground">Uploaded just now</p>
+                      <p className="text-sm text-muted-foreground">
+                        Uploaded just now
+                      </p>
                     </div>
-                    <Button size="icon" variant="ghost" className="h-8 w-8 rounded-full">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-8 w-8 rounded-full"
+                    >
                       <PlayCircle className="h-5 w-5 text-primary" />
                     </Button>
                   </div>
@@ -112,7 +168,11 @@ export default function SamplePage() {
               )}
             </CardContent>
             <CardFooter className="bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5">
-              <Button onClick={handleGenerate} disabled={isGenerating || !isUploaded} className="gap-1 rounded-full">
+              <Button
+                onClick={handleGenerate}
+                disabled={isGenerating || !isUploaded}
+                className="gap-1 rounded-full"
+              >
                 {isGenerating ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -135,16 +195,24 @@ export default function SamplePage() {
                   <Music2 className="mr-2 h-5 w-5 text-primary" />
                   Generated Music
                 </CardTitle>
-                <CardDescription>Your AI-transformed audio is ready to play</CardDescription>
+                <CardDescription>
+                  Your AI-transformed audio is ready to play
+                </CardDescription>
               </CardHeader>
               <CardContent className="pt-6">
                 <div className="rounded-md border p-4 bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5">
                   <div className="flex justify-between items-center mb-4">
                     <div>
                       <h3 className="font-medium">Transformed {fileName}</h3>
-                      <p className="text-sm text-muted-foreground">Generated on {new Date().toLocaleDateString()}</p>
+                      <p className="text-sm text-muted-foreground">
+                        Generated on {new Date().toLocaleDateString()}
+                      </p>
                     </div>
-                    <Button size="icon" variant="ghost" className="h-8 w-8 rounded-full">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-8 w-8 rounded-full"
+                    >
                       <PlayCircle className="h-5 w-5 text-primary" />
                     </Button>
                   </div>
@@ -190,14 +258,23 @@ export default function SamplePage() {
                   <Label>Duration Extension</Label>
                   <span className="text-sm font-medium">+30s</span>
                 </div>
-                <Slider defaultValue={[30]} max={120} step={5} className="[&>span]:bg-primary" />
+                <Slider
+                  defaultValue={[30]}
+                  max={120}
+                  step={5}
+                  className="[&>span]:bg-primary"
+                />
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label>Sample Influence</Label>
                   <span className="text-sm font-medium">High</span>
                 </div>
-                <Slider defaultValue={[70]} max={100} className="[&>span]:bg-secondary" />
+                <Slider
+                  defaultValue={[70]}
+                  max={100}
+                  className="[&>span]:bg-secondary"
+                />
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -211,8 +288,9 @@ export default function SamplePage() {
                           </TooltipTrigger>
                           <TooltipContent>
                             <p className="w-[200px] text-xs">
-                              Controls how much the AI will transform your original sample. Lower values stay closer to
-                              the original.
+                              Controls how much the AI will transform your
+                              original sample. Lower values stay closer to the
+                              original.
                             </p>
                           </TooltipContent>
                         </Tooltip>
@@ -221,7 +299,11 @@ export default function SamplePage() {
                   </Label>
                   <span className="text-sm font-medium">Medium</span>
                 </div>
-                <Slider defaultValue={[50]} max={100} className="[&>span]:bg-accent" />
+                <Slider
+                  defaultValue={[50]}
+                  max={100}
+                  className="[&>span]:bg-accent"
+                />
               </div>
             </CardContent>
           </Card>
@@ -247,6 +329,5 @@ export default function SamplePage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
-

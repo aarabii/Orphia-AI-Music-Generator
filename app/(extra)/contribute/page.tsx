@@ -14,11 +14,24 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useConvexAuth } from "convex/react";
+import { Spinner } from "@/components/spinner";
+import { redirect } from "next/navigation";
 
 export default function ContributePage() {
+  const { isAuthenticated, isLoading } = useConvexAuth();
+
+  if (isLoading) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return redirect("/");
+  }
   // Prepare share content
   const shareTitle = "Check out Orphia - AI-powered music generation!";
   const shareText =

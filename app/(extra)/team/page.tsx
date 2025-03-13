@@ -9,9 +9,25 @@ import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { teamMembers } from "@/constants/team-members";
+import { useConvexAuth } from "convex/react";
+import { Spinner } from "@/components/spinner";
+import { redirect } from "next/navigation";
 
 export default function TeamPage() {
+  const { isAuthenticated, isLoading } = useConvexAuth();
   const [hoveredMember, setHoveredMember] = useState<number | null>(null);
+
+  if (isLoading) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return redirect("/");
+  }
 
   return (
     <div className="container py-8">

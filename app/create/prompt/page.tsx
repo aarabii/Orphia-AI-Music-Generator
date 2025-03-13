@@ -1,37 +1,79 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Info, Loader2, Music2, PlayCircle, PlusCircle, Sparkles, Wand2, Zap } from "lucide-react"
+import { useState } from "react";
+import {
+  Info,
+  Loader2,
+  Music2,
+  PlayCircle,
+  PlusCircle,
+  Sparkles,
+  Wand2,
+  Zap,
+} from "lucide-react";
 
-import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Slider } from "@/components/ui/slider"
-import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Slider } from "@/components/ui/slider";
+import { Label } from "@/components/ui/label";
+import { useConvexAuth } from "convex/react";
+import { Spinner } from "@/components/spinner";
+import { redirect } from "next/navigation";
 
 export default function PromptPage() {
-  const [prompt, setPrompt] = useState("")
-  const [isGenerating, setIsGenerating] = useState(false)
-  const [generatedMusic, setGeneratedMusic] = useState(false)
+  const { isAuthenticated, isLoading } = useConvexAuth();
+
+  const [prompt, setPrompt] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedMusic, setGeneratedMusic] = useState(false);
+
+  if (isLoading) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return redirect("/");
+  }
 
   const handleGenerate = () => {
-    if (prompt.trim().length === 0) return
+    if (prompt.trim().length === 0) return;
 
-    setIsGenerating(true)
+    setIsGenerating(true);
 
     // Simulate music generation
     setTimeout(() => {
-      setIsGenerating(false)
-      setGeneratedMusic(true)
-    }, 3000)
-  }
+      setIsGenerating(false);
+      setGeneratedMusic(true);
+    }, 3000);
+  };
 
   return (
     <div className="container py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight mb-2 gradient-text">Create with Prompt</h1>
-        <p className="text-muted-foreground">Describe the music you want to create using natural language.</p>
+        <h1 className="text-3xl font-bold tracking-tight mb-2 gradient-text">
+          Create with Prompt
+        </h1>
+        <p className="text-muted-foreground">
+          Describe the music you want to create using natural language.
+        </p>
       </div>
 
       <div className="grid gap-8 md:grid-cols-[1fr_350px]">
@@ -42,7 +84,10 @@ export default function PromptPage() {
                 <Sparkles className="mr-2 h-5 w-5 text-primary" />
                 Your Prompt
               </CardTitle>
-              <CardDescription>Describe the music you want to generate as specifically as possible</CardDescription>
+              <CardDescription>
+                Describe the music you want to generate as specifically as
+                possible
+              </CardDescription>
             </CardHeader>
             <CardContent className="pt-6">
               <Textarea
@@ -80,16 +125,24 @@ export default function PromptPage() {
                   <Music2 className="mr-2 h-5 w-5 text-primary" />
                   Generated Music
                 </CardTitle>
-                <CardDescription>Your AI-generated music is ready to play</CardDescription>
+                <CardDescription>
+                  Your AI-generated music is ready to play
+                </CardDescription>
               </CardHeader>
               <CardContent className="pt-6">
                 <div className="rounded-md border p-4 bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5">
                   <div className="flex justify-between items-center mb-4">
                     <div>
                       <h3 className="font-medium">Your Composition</h3>
-                      <p className="text-sm text-muted-foreground">Generated on {new Date().toLocaleDateString()}</p>
+                      <p className="text-sm text-muted-foreground">
+                        Generated on {new Date().toLocaleDateString()}
+                      </p>
                     </div>
-                    <Button size="icon" variant="ghost" className="h-8 w-8 rounded-full">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-8 w-8 rounded-full"
+                    >
                       <PlayCircle className="h-5 w-5 text-primary" />
                     </Button>
                   </div>
@@ -135,14 +188,23 @@ export default function PromptPage() {
                   <Label>Duration</Label>
                   <span className="text-sm font-medium">30s</span>
                 </div>
-                <Slider defaultValue={[30]} max={120} step={5} className="[&>span]:bg-primary" />
+                <Slider
+                  defaultValue={[30]}
+                  max={120}
+                  step={5}
+                  className="[&>span]:bg-primary"
+                />
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label>Creativity</Label>
                   <span className="text-sm font-medium">Medium</span>
                 </div>
-                <Slider defaultValue={[50]} max={100} className="[&>span]:bg-secondary" />
+                <Slider
+                  defaultValue={[50]}
+                  max={100}
+                  className="[&>span]:bg-secondary"
+                />
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -156,7 +218,8 @@ export default function PromptPage() {
                           </TooltipTrigger>
                           <TooltipContent>
                             <p className="w-[200px] text-xs">
-                              Controls how intricate the composition will be. Higher values create more complex musical
+                              Controls how intricate the composition will be.
+                              Higher values create more complex musical
                               structures.
                             </p>
                           </TooltipContent>
@@ -166,7 +229,11 @@ export default function PromptPage() {
                   </Label>
                   <span className="text-sm font-medium">Low</span>
                 </div>
-                <Slider defaultValue={[30]} max={100} className="[&>span]:bg-accent" />
+                <Slider
+                  defaultValue={[30]}
+                  max={100}
+                  className="[&>span]:bg-accent"
+                />
               </div>
             </CardContent>
           </Card>
@@ -199,6 +266,5 @@ export default function PromptPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
-

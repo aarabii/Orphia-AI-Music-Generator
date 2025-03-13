@@ -22,8 +22,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useConvexAuth } from "convex/react";
+import { Spinner } from "@/components/spinner";
+import { redirect } from "next/navigation";
 
 export default function ModelPage() {
+  const { isAuthenticated, isLoading } = useConvexAuth();
   const controls = useAnimation();
   const [useIframe, setUseIframe] = useState(false);
 
@@ -34,6 +38,18 @@ export default function ModelPage() {
       transition: { delay: i * 0.1, duration: 0.5 },
     }));
   }, [controls]);
+
+  if (isLoading) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return redirect("/");
+  }
 
   return (
     <div className="container py-8">
