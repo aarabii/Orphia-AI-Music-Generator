@@ -26,6 +26,10 @@ import {
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Image from "next/image";
+import { SignInButton, UserButton } from "@clerk/nextjs";
+import { useConvexAuth } from "convex/react";
+import { Spinner } from "../spinner";
+import { Fragment } from "react";
 
 interface SiteHeaderProps {
   showMobileOnly?: boolean;
@@ -34,6 +38,7 @@ interface SiteHeaderProps {
 export function SiteHeader({ showMobileOnly = false }: SiteHeaderProps) {
   const pathname = usePathname();
   const isLandingPage = pathname === "/";
+  const { isAuthenticated, isLoading } = useConvexAuth();
 
   const navItems = [
     { href: "/", label: "Home", icon: <Home className="h-5 w-5" /> },
@@ -124,16 +129,38 @@ export function SiteHeader({ showMobileOnly = false }: SiteHeaderProps) {
           <nav className="flex items-center space-x-2">
             {isLandingPage && (
               <div className="flex items-center space-x-1">
-                <Link href="/sign-in">
-                  <Button variant="ghost" size="sm" className="rounded-full">
-                    Sign In
-                  </Button>
-                </Link>
-                <Link href="/sign-up">
-                  <Button size="sm" className="rounded-full">
-                    Create Account
-                  </Button>
-                </Link>
+                {isLoading && <Spinner />}
+                {!isLoading && !isAuthenticated && (
+                  <Fragment>
+                    <SignInButton mode="modal">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="rounded-full"
+                      >
+                        Sign In
+                      </Button>
+                    </SignInButton>
+                    <SignInButton mode="modal">
+                      <Button size="sm" className="rounded-full">
+                        Create Account
+                      </Button>
+                    </SignInButton>
+                  </Fragment>
+                )}
+                {isAuthenticated && !isLoading && (
+                  <Fragment>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="rounded-full"
+                      asChild
+                    >
+                      <Link href="/create/prompt">Get Started</Link>
+                    </Button>
+                    <UserButton afterSignOutUrl="/" />
+                  </Fragment>
+                )}
               </div>
             )}
             <Sheet>
