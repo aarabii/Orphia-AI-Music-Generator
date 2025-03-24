@@ -33,6 +33,7 @@ import { Label } from "@/components/ui/label";
 import { useConvexAuth } from "convex/react";
 import { Spinner } from "@/components/spinner";
 import { redirect } from "next/navigation";
+import { toast } from "sonner";
 
 export default function PromptPage() {
   const { isAuthenticated, isLoading } = useConvexAuth();
@@ -40,6 +41,11 @@ export default function PromptPage() {
   const [prompt, setPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedMusic, setGeneratedMusic] = useState(false);
+  const [duration, setDuration] = useState(30);
+  const [creativity, setCreativity] = useState(50);
+  const [complexity, setComplexity] = useState(30);
+  const [audioURL, setAudioURL] = useState("");
+  const [audioPlayer, setAudioPlayer] = useState<HTMLAudioElement | null>(null);
 
   if (isLoading) {
     return (
@@ -53,17 +59,134 @@ export default function PromptPage() {
     return redirect("/");
   }
 
-  const handleGenerate = () => {
-    if (prompt.trim().length === 0) return;
+  const handleGenerate = async () => {
+    // Validate input
+    if (prompt.trim().length === 0) {
+      toast.error("Please enter a prompt for music generation",);
+      return;
+    }
 
+    // Reset previous state
+    if (audioPlayer) {
+      audioPlayer.pause();
+    }
+    setGeneratedMusic(false);
+    setAudioURL("");
+
+    // Start generation
     setIsGenerating(true);
 
-    // Simulate music generation
-    setTimeout(() => {
-      setIsGenerating(false);
+    try {
+      // Prepare generation parameters
+      const generationParams = {
+        prompt: prompt.trim(),
+        duration: duration,
+        creativity: creativity / 100,
+        complexity: complexity / 100
+      };
+
+      // Make API call to generate music
+      const response = await fetch("/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(generationParams),
+      });
+
+      // Enhanced error handling
+      if (!response.ok) {
+        // Try to get more detailed error information
+        let errorBody;
+        try {
+          errorBody = await response.json();
+          console.error('Detailed API Error:', {
+            status: response.status,
+            body: errorBody
+          });
+        } catch (parseError) {
+          console.error('Error parsing error response:', parseError);
+          errorBody = await response.text();
+        }
+
+        // Construct a more informative error message
+        const errorMessage = `Music generation failed: ${response.status} ${JSON.stringify(errorBody)}`;
+
+        // Log the full error details
+        console.error(errorMessage);
+
+        // Throw an error with detailed context
+        throw new Error(errorMessage);
+      }
+
+      // Process audio data
+      const data = await response.arrayBuffer();
+
+      // Additional validation for audio data
+      if (!data || data.byteLength === 0) {
+        throw new Error("Received empty audio data");
+      }
+
+      const blob = new Blob([data], { type: "audio/mpeg" });
+      const url = URL.createObjectURL(blob);
+
+      // Update state
+      setAudioURL(url);
       setGeneratedMusic(true);
-    }, 3000);
+
+      // Prepare audio player
+      const player = new Audio(url);
+      setAudioPlayer(player);
+
+      // Show success toast
+      toast.success("Your AI-generated music is ready!");
+    } catch (error) {
+      // Comprehensive error logging
+      console.error("Full music generation error:", error);
+
+      // Provide user-friendly error message
+      toast.error(
+        error instanceof Error
+          ? `Error: ${error.message}`
+          : "An unexpected error occurred during music generation"
+      );
+    } finally {
+      setIsGenerating(false);
+    }
   };
+
+  const handleDownload = () => {
+    if (!audioURL) {
+      toast.error("No audio to download");
+      return;
+    }
+
+    try {
+      const a = document.createElement("a");
+      a.href = audioURL;
+      a.download = `orphia-${new Date().toISOString().slice(0, 10)}.wav`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      toast.info("Downloading audio...");
+    } catch (error) {
+      console.error("download error: ", error);
+      toast.error("An error occurred while downloading audio");
+    }
+  }
+
+  const handlePlayPause = () => {
+    if (!audioPlayer) {
+      toast.error("No audio to play");
+      return;
+    }
+
+    if (audioPlayer.paused) {
+      audioPlayer.play();
+    } else {
+      audioPlayer.pause();
+    }
+  }
 
   return (
     <div className="container py-8">
@@ -142,6 +265,7 @@ export default function PromptPage() {
                       size="icon"
                       variant="ghost"
                       className="h-8 w-8 rounded-full"
+                      onClick={handlePlayPause}
                     >
                       <PlayCircle className="h-5 w-5 text-primary" />
                     </Button>
@@ -163,10 +287,26 @@ export default function PromptPage() {
                 </div>
               </CardContent>
               <CardFooter className="flex justify-between bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5">
-                <Button variant="outline" size="sm" className="rounded-full">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full"
+                  onClick={() => {
+                    // Reset for regeneration
+                    setGeneratedMusic(false);
+                    if (audioPlayer) {
+                      audioPlayer.pause();
+                    }
+                    setAudioURL("");
+                  }}
+                >
                   Regenerate
                 </Button>
-                <Button size="sm" className="rounded-full">
+                <Button
+                  size="sm"
+                  className="rounded-full"
+                  onClick={handleDownload}
+                >
                   Download
                 </Button>
               </CardFooter>
@@ -186,10 +326,11 @@ export default function PromptPage() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label>Duration</Label>
-                  <span className="text-sm font-medium">30s</span>
+                  <span className="text-sm font-medium">{duration}</span>
                 </div>
                 <Slider
-                  defaultValue={[30]}
+                  value={[duration]}
+                  onValueChange={(value) => setDuration(value[0])}
                   max={120}
                   step={5}
                   className="[&>span]:bg-primary"
@@ -198,10 +339,11 @@ export default function PromptPage() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label>Creativity</Label>
-                  <span className="text-sm font-medium">Medium</span>
+                  <span className="text-sm font-medium">{creativity}%</span>
                 </div>
                 <Slider
-                  defaultValue={[50]}
+                  value={[creativity]}
+                  onValueChange={(value) => setCreativity(value[0])}
                   max={100}
                   className="[&>span]:bg-secondary"
                 />
@@ -227,10 +369,11 @@ export default function PromptPage() {
                       </TooltipProvider>
                     </div>
                   </Label>
-                  <span className="text-sm font-medium">Low</span>
+                  <span className="text-sm font-medium">{complexity}%</span>
                 </div>
                 <Slider
-                  defaultValue={[30]}
+                  value={[complexity]}
+                  onValueChange={(value) => setComplexity(value[0])}
                   max={100}
                   className="[&>span]:bg-accent"
                 />

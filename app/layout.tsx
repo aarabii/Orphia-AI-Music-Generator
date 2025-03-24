@@ -26,7 +26,7 @@ export default function RootLayout({
         <ConvexClientProvider>
           <LayoutWrapper>
             {children}
-            <Toaster className="z-100" position="bottom-right" />
+            <Toaster className="z-100" position="bottom-right" closeButton />
           </LayoutWrapper>
         </ConvexClientProvider>
       </body>
