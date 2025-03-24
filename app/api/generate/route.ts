@@ -1,11 +1,28 @@
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
-    // Log the entire request for debugging
     console.log('------- MusicGen API Route Debug -------');
-    console.log('Request received at:', new Date().toISOString());
+    console.log('Timestamp:', new Date().toISOString());
+    console.log('Environment Variables:');
+    console.log('NEXT_PUBLIC_HF_TOKEN_WRITE:', process.env.NEXT_PUBLIC_HF_TOKEN_WRITE ? 'Present' : 'MISSING');
 
     try {
+        // Early token validation with more context
+        if (!process.env.NEXT_PUBLIC_HF_TOKEN_WRITE) {
+            console.error('CRITICAL: Hugging Face Token is not set');
+            return NextResponse.json(
+                {
+                    error: 'Server configuration error',
+                    details: 'Hugging Face API token is missing. Please check your environment configuration.',
+                    diagnostics: {
+                        envVarExists: false,
+                        tokenLength: 0
+                    }
+                },
+                { status: 500 }
+            );
+        }
+
         // Attempt to parse request body with extra error handling
         let requestBody;
         try {
@@ -42,17 +59,8 @@ export async function POST(request: Request) {
             );
         }
 
-        // Log environment variables check
-        if (!process.env.HF_TOKEN) {
-            console.error('CRITICAL: Hugging Face Token is not set');
-            return NextResponse.json(
-                {
-                    error: 'Server configuration error',
-                    details: 'Hugging Face API token is missing'
-                },
-                { status: 500 }
-            );
-        }
+        // The following check is removed/updated since we are using NEXT_PUBLIC_HF_TOKEN_WRITE:
+        // if (!process.env.HF_TOKEN) { ... }
 
         // Prepare request parameters
         const clampedDuration = Math.min(Math.max(5, duration), 120);
@@ -67,7 +75,7 @@ export async function POST(request: Request) {
         // Attempt to call Hugging Face API
         try {
             const huggingFaceResponse = await fetch(
-                "https://api-inference.huggingface.co/models/facebook/musicgen-small",
+                "https://router.huggingface.co/hf-inference/models/facebook/musicgen-small",
                 {
                     method: "POST",
                     headers: {
@@ -76,23 +84,21 @@ export async function POST(request: Request) {
                     },
                     body: JSON.stringify({
                         inputs: prompt,
-                        parameters: {
-                            max_new_tokens: clampedDuration * 10,
-                            temperature: creativity,
-                            guidance_scale: complexity * 2,
-                            do_sample: true,
-                        },
+                        // parameters: {
+                        //     max_new_tokens: clampedDuration * 10,
+                        //     temperature: creativity,
+                        //     guidance_scale: complexity * 2,
+                        //     do_sample: true,
+                        // },
                     }),
                 }
             );
 
-            // Log response details
             console.log('Hugging Face API Response:', {
                 status: huggingFaceResponse.status,
                 statusText: huggingFaceResponse.statusText
             });
 
-            // Handle non-200 responses
             if (!huggingFaceResponse.ok) {
                 const errorText = await huggingFaceResponse.text();
                 console.error('Hugging Face API Error:', {
@@ -110,10 +116,8 @@ export async function POST(request: Request) {
                 );
             }
 
-            // Process audio data
             const audioData = await huggingFaceResponse.arrayBuffer();
 
-            // Validate audio data
             if (!audioData || audioData.byteLength === 0) {
                 console.warn('No audio data generated');
                 return NextResponse.json(
@@ -127,7 +131,6 @@ export async function POST(request: Request) {
 
             console.log(`Audio data generated: ${audioData.byteLength} bytes`);
 
-            // Return audio response
             return new Response(audioData, {
                 headers: {
                     'Content-Type': 'audio/mpeg',
@@ -149,9 +152,7 @@ export async function POST(request: Request) {
                 { status: 500 }
             );
         }
-
     } catch (error) {
-        // Catch-all error handler
         console.error('CRITICAL: Unexpected Error in Music Generation', error);
 
         return NextResponse.json(
