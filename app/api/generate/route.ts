@@ -1,17 +1,9 @@
 import { NextResponse } from "next/server";
-
+// Debugging line to check if the token is set
 export async function POST(request: Request) {
-  console.log("------- MusicGen API Route Debug -------");
-  console.log("Timestamp:", new Date().toISOString());
-  console.log("Environment Variables:");
-  console.log(
-    "NEXT_PUBLIC_HF_TOKEN_WRITE:",
-    process.env.NEXT_PUBLIC_HF_TOKEN_WRITE ? "Present" : "MISSING"
-  );
-
   try {
     // Early token validation with more context
-    if (!process.env.NEXT_PUBLIC_HF_TOKEN_WRITE) {
+    if (!process.env.HF_TOKEN) {
       console.error("CRITICAL: Hugging Face Token is not set");
       return NextResponse.json(
         {
@@ -66,10 +58,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // The following check is removed/updated since we are using NEXT_PUBLIC_HF_TOKEN_WRITE:
-    // if (!process.env.HF_TOKEN) { ... }
-
-    // Prepare request parameters
     const clampedDuration = Math.min(Math.max(5, duration), 120);
 
     console.log("Generation Parameters:", {
