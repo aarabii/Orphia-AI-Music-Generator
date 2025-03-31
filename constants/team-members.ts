@@ -1,10 +1,10 @@
 import projectMentor from "@/assets/image/projectMentor.png";
 
 import AarabImage from "@/assets/image/aarab.png";
-import ShivanshImage from "@/assets/image/rastogi.png";
-import TanishqImage from "@/assets/image/mowar.png";
 import DivyamImage from "@/assets/image/divyam.png";
+import TanishqImage from "@/assets/image/mowar.png";
 import SriyansImage from "@/assets/image/pani.png";
+import ShivanshImage from "@/assets/image/rastogi.png";
 import SoumyaImage from "@/assets/image/riit.png";
 
 export const teamMembers = [
@@ -65,7 +65,7 @@ export const teamMembers = [
 ];
 
 export const teacherMentor = {
-  name: "Dr. Sarah Johnson",
+  name: "Dr. Chandini Kumari",
   role: "Project Mentor & Professor",
   description:
     "Chandani Kumari has done her BTech from KIIT, Deemed to be University, Bhubaneswar. She is currently pursuing M.Tech. from KIIT, Deemed to be University, Bhubaneswar. She has industrial experience in IT sector and is a certified trainer in Core and Advanced Java. Her areas of research are software engineering, machine learning, artificial intelligence, data science , data analytics and soft computing.",
