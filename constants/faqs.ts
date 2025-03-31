@@ -1,62 +1,48 @@
 export const faqs = [
   {
-    question: "How does Orphia generate music?",
+    question: "What is Orphia?",
     answer:
-      "Orphia uses a state-of-the-art neural network trained on thousands of music samples. It combines transformer architecture with audio processing techniques to generate music that matches your prompt or builds upon your sample.",
+    "Orphia is platform that allows you to generate original music using text descriptions. You can also incorporate existing music snippets into your creations.",
   },
   {
-    question: "What types of music can Orphia create?",
+    question: "How does the text-to-music generation work?",
     answer:
-      "Orphia can generate a wide variety of musical styles including classical, electronic, ambient, pop, and more. The more specific your prompt, the better the AI can match your desired style.",
+      "Orphia uses advanced AI models that analyse your text input and translate it into musical elements like melody, harmony, rhythm, and instrumentation. It interprets the emotional tone and descriptive words in your text to create a corresponding musical piece.",
   },
   {
-    question: "Do I own the music created with Orphia?",
+    question: "What kind of text input is accepted?",
     answer:
-      "Yes, all music generated using Orphia is royalty-free and can be used for personal or commercial projects. However, we recommend checking with local copyright laws for specific use cases.",
+      ": Orphia accept a variety of text inputs, including descriptions of moods, scenes, stories, or specific musical elements. The more descriptive your text to Orphia, the better the output.",
   },
   {
-    question: "Can I upload and modify existing copyrighted music?",
+    question: "In what formats can I download my Orphia music in?",
     answer:
-      "No, you should only upload samples that you have created yourself or have permission to use. Orphia is not designed to modify copyrighted material without proper authorization.",
+      "You can download your music in WAV format.",
   },
   {
-    question: "How long can the generated music be?",
+    question: "What AI models and technologies are used to generate the music?",
     answer:
-      "Currently, Orphia can generate pieces between 10 seconds and 2 minutes in length. We're working on extending this limit in future updates.",
+      "Orphia is based on Frontend on NeXTs, Model trained on Python Algorithm for training RNN-LSTM, Model for classification and filtrations on Adams prebuild mode on musicMe-small and dataset used is Essen's Europe folk song dataset.",
   },
   {
-    question: "Is there a limit to how many pieces I can generate?",
+    question: "Are there any specific hardware or software requirements to use Orphia?",
     answer:
-      "Free accounts can generate up to 5 music pieces per day. In the future, we plan to offer premium tiers with higher limits and additional features.",
+      ": No, Orphia is designed to be accessible from any modern web browser. A stable internet connection is recommended to get the best use of Orphia.",
   },
   {
-    question: "What file formats are supported for upload and download?",
+    question: "Are there any limitations on the length or complexity of the music generated?",
     answer:
-      "Orphia supports uploading audio in MP3, WAV, and AIFF formats. Generated music can be downloaded in MP3, WAV, or FLAC formats.",
+      "Orphia generates samples of maximum 60 seconds",
   },
   {
-    question: "Can I edit the music after it's generated?",
+    question: "Why use Orphia?",
     answer:
-      "Yes, you can regenerate sections, adjust parameters, or download the stems for further editing in your preferred digital audio workstation (DAW).",
+      "Orphia can be used for-Creating background music for videos/podcasts, generating unique soundtracks for games/animations, composing original music for personal projects or social media and pretty much everything.",
   },
   {
-    question: "How accurate is the AI at following my prompts?",
+    question: "Can I use Orphia for educational purposes?",
     answer:
-      "The AI has been trained to understand musical concepts and terminology. For best results, be specific about genre, instruments, tempo, mood, and structure in your prompts.",
+      "Absolutely! Orphia is great way to explore music composition and learn about different musical elements.",
   },
-  {
-    question: "Is my data private and secure?",
-    answer:
-      "Yes, we take data privacy seriously. Your uploaded samples and generated music are stored securely and are only accessible to you unless you choose to share them publicly.",
-  },
-  {
-    question: "Can I use Orphia for commercial projects?",
-    answer:
-      "Music generated with Orphia can be used in commercial projects including videos, games, podcasts, and more without royalty payments.",
-  },
-  {
-    question: "How can I improve the quality of generated music?",
-    answer:
-      "Try using detailed prompts, experiment with different parameters, and use high-quality samples if you're uploading audio. You can also iterate on your generations by refining your prompts based on results.",
-  },
+  
 ];
