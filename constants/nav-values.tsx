@@ -21,11 +21,11 @@ export const navItems = [
     href: "/create/prompt",
     icon: <Sparkles className="h-5 w-5" />,
   },
-  // {
-  //   title: "Upload Sample",
-  //   href: "/create/sample",
-  //   icon: <Upload className="h-5 w-5" />,
-  // },
+  {
+    title: "Upload Sample",
+    href: "/create/sample",
+    icon: <Upload className="h-5 w-5" />,
+  },
   {
     title: "Our Team",
     href: "/team",
