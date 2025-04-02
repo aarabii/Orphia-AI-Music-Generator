@@ -74,7 +74,7 @@ export async function POST(request: Request) {
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${process.env.HF_TOKEN}`,
+            Authorization: `Bearer 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`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
