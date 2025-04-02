@@ -87,7 +87,7 @@ export const NotebookCode = () => {
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-gray-100">
             <BookOpen className="h-5 w-5 text-primary" />
-            Jupyter Notebook: Orphia [cite: 1]
+            Jupyter Notebook: Orphia
           </CardTitle>
           <Link
             href="https://colab.research.google.com/drive/10Kv_A2nF1qXvHqbRziLsjovHq03Og34g?usp=sharing"

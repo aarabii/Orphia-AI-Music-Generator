@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   FileAudio,
   Info,
@@ -41,10 +41,22 @@ export default function SamplePage() {
   const { isAuthenticated, isLoading } = useConvexAuth();
 
   const [fileName, setFileName] = useState("");
+  const [fileObj, setFileObj] = useState<File | null>(null);
   const [isUploaded, setIsUploaded] = useState(false);
   const [prompt, setPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedMusic, setGeneratedMusic] = useState(false);
+  const [generatedAudioUrl, setGeneratedAudioUrl] = useState("");
+  const [error, setError] = useState("");
+
+  // Settings states
+  const [duration, setDuration] = useState(30);
+  const [sampleInfluence, setSampleInfluence] = useState(70);
+  const [transformationStyle, setTransformationStyle] = useState(50);
+
+  // Audio player refs
+  const uploadedAudioRef = useRef<HTMLAudioElement>(null);
+  const generatedAudioRef = useRef<HTMLAudioElement>(null);
 
   if (isLoading) {
     return (
@@ -60,21 +72,80 @@ export default function SamplePage() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFileName(e.target.files[0].name);
+      const file = e.target.files[0];
+      setFileName(file.name);
+      setFileObj(file);
       setIsUploaded(true);
     }
   };
 
-  const handleGenerate = () => {
-    if (!isUploaded) return;
+  const playOriginalAudio = () => {
+    if (uploadedAudioRef.current) {
+      uploadedAudioRef.current.play();
+    }
+  };
+
+  const playGeneratedAudio = () => {
+    if (generatedAudioRef.current) {
+      generatedAudioRef.current.play();
+    }
+  };
+
+  const handleGenerate = async () => {
+    if (!isUploaded || !fileObj) return;
 
     setIsGenerating(true);
+    setError("");
 
-    // Simulate music generation
-    setTimeout(() => {
-      setIsGenerating(false);
+    try {
+      // Create form data to send the audio file and parameters
+      const formData = new FormData();
+      formData.append("audioFile", fileObj);
+      formData.append("prompt", prompt);
+      formData.append("duration", duration.toString());
+      formData.append("sampleInfluence", sampleInfluence.toString());
+      formData.append("transformationStyle", transformationStyle.toString());
+
+      // Send to our API route
+      const response = await fetch("/api/generate-music", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      // Set the URL to our generated audio file
+      setGeneratedAudioUrl(data.audioUrl);
       setGeneratedMusic(true);
-    }, 3000);
+    } catch (err: any) {
+      setError(err.message || "Failed to generate music");
+      console.error("Error generating music:", err);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleRegenerate = () => {
+    // Reset states to allow regeneration with the same file
+    setGeneratedMusic(false);
+    setGeneratedAudioUrl("");
+    handleGenerate();
+  };
+
+  const handleDownload = () => {
+    if (generatedAudioUrl) {
+      // Create anchor and trigger download
+      const a = document.createElement("a");
+      a.href = generatedAudioUrl;
+      a.download = `transformed_${fileName}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
   };
 
   return (
@@ -84,7 +155,8 @@ export default function SamplePage() {
           Upload Sample
         </h1>
         <p className="text-muted-foreground">
-          Upload an audio sample and let AI extend it or transform it.
+          Upload an audio sample and let AI extend it or transform it using
+          Meta's MusicGen.
         </p>
       </div>
 
@@ -140,9 +212,17 @@ export default function SamplePage() {
                       size="icon"
                       variant="ghost"
                       className="h-8 w-8 rounded-full"
+                      onClick={playOriginalAudio}
                     >
                       <PlayCircle className="h-5 w-5 text-primary" />
                     </Button>
+                    {fileObj && (
+                      <audio
+                        ref={uploadedAudioRef}
+                        src={URL.createObjectURL(fileObj)}
+                        className="hidden"
+                      />
+                    )}
                   </div>
                   <div className="h-16 rounded-md bg-gradient-to-r from-primary/10 via-secondary/20 to-accent/10 mb-2 flex items-center justify-center relative overflow-hidden">
                     <div className="absolute inset-0 flex items-center justify-center">
@@ -159,11 +239,17 @@ export default function SamplePage() {
                     </div>
                   </div>
                   <Textarea
-                    placeholder="Optional: Add specific instructions for how to transform your sample"
+                    placeholder="Optional: Add specific instructions for how to transform your sample (e.g., 'Turn this into jazz' or 'Add a drum beat')"
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
                     className="mt-4 border-primary/20 focus-visible:ring-primary"
                   />
+                </div>
+              )}
+
+              {error && (
+                <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-md text-sm">
+                  {error}
                 </div>
               )}
             </CardContent>
@@ -212,9 +298,17 @@ export default function SamplePage() {
                       size="icon"
                       variant="ghost"
                       className="h-8 w-8 rounded-full"
+                      onClick={playGeneratedAudio}
                     >
                       <PlayCircle className="h-5 w-5 text-primary" />
                     </Button>
+                    {generatedAudioUrl && (
+                      <audio
+                        ref={generatedAudioRef}
+                        src={generatedAudioUrl}
+                        className="hidden"
+                      />
+                    )}
                   </div>
                   <div className="h-16 rounded-md bg-gradient-to-r from-primary/10 via-secondary/20 to-accent/10 mb-2 flex items-center justify-center relative overflow-hidden">
                     <div className="absolute inset-0 flex items-center justify-center">
@@ -233,10 +327,27 @@ export default function SamplePage() {
                 </div>
               </CardContent>
               <CardFooter className="flex justify-between bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5">
-                <Button variant="outline" size="sm" className="rounded-full">
-                  Regenerate
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full"
+                  onClick={handleRegenerate}
+                  disabled={isGenerating}
+                >
+                  {isGenerating ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-1" />
+                      Regenerating...
+                    </>
+                  ) : (
+                    "Regenerate"
+                  )}
                 </Button>
-                <Button size="sm" className="rounded-full">
+                <Button
+                  size="sm"
+                  className="rounded-full"
+                  onClick={handleDownload}
+                >
                   Download
                 </Button>
               </CardFooter>
@@ -256,10 +367,11 @@ export default function SamplePage() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label>Duration Extension</Label>
-                  <span className="text-sm font-medium">+30s</span>
+                  <span className="text-sm font-medium">+{duration}s</span>
                 </div>
                 <Slider
-                  defaultValue={[30]}
+                  value={[duration]}
+                  onValueChange={(value) => setDuration(value[0])}
                   max={120}
                   step={5}
                   className="[&>span]:bg-primary"
@@ -268,10 +380,17 @@ export default function SamplePage() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label>Sample Influence</Label>
-                  <span className="text-sm font-medium">High</span>
+                  <span className="text-sm font-medium">
+                    {sampleInfluence <= 30
+                      ? "Low"
+                      : sampleInfluence <= 70
+                        ? "Medium"
+                        : "High"}
+                  </span>
                 </div>
                 <Slider
-                  defaultValue={[70]}
+                  value={[sampleInfluence]}
+                  onValueChange={(value) => setSampleInfluence(value[0])}
                   max={100}
                   className="[&>span]:bg-secondary"
                 />
@@ -297,10 +416,17 @@ export default function SamplePage() {
                       </TooltipProvider>
                     </div>
                   </Label>
-                  <span className="text-sm font-medium">Medium</span>
+                  <span className="text-sm font-medium">
+                    {transformationStyle <= 30
+                      ? "Subtle"
+                      : transformationStyle <= 70
+                        ? "Medium"
+                        : "Dramatic"}
+                  </span>
                 </div>
                 <Slider
-                  defaultValue={[50]}
+                  value={[transformationStyle]}
+                  onValueChange={(value) => setTransformationStyle(value[0])}
                   max={100}
                   className="[&>span]:bg-accent"
                 />

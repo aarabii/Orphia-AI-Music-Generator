@@ -162,7 +162,7 @@ export default function LandingPage() {
                       Create with Prompt
                     </Button>
                   </Link>
-                  <Link href="/create/sample">
+                  {/* <Link href="/create/sample">
                     <Button
                       size="lg"
                       variant="outline"
@@ -171,7 +171,7 @@ export default function LandingPage() {
                       <Upload className="h-4 w-4" />
                       Upload Sample
                     </Button>
-                  </Link>
+                  </Link> */}
                 </motion.div>
               </div>
               <motion.div
