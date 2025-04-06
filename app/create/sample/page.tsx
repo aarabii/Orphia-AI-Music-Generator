@@ -34,6 +34,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useConvexAuth } from "convex/react";
 import { Spinner } from "@/components/spinner";
 import { redirect } from "next/navigation";
+import { toast } from "sonner";
 
 export default function MusicGenPage() {
   const { isAuthenticated, isLoading } = useConvexAuth();
@@ -46,6 +47,8 @@ export default function MusicGenPage() {
   const [generatedMusic, setGeneratedMusic] = useState(false);
   const [generatedAudioUrl, setGeneratedAudioUrl] = useState("");
   const [error, setError] = useState("");
+  const [audioURL, setAudioURL] = useState("");
+  const [audioPlayer, setAudioPlayer] = useState<HTMLAudioElement | null>(null);
 
   // Settings states
   const [duration, setDuration] = useState(30);
@@ -140,14 +143,35 @@ export default function MusicGenPage() {
   };
 
   const handleDownload = () => {
-    if (generatedAudioUrl) {
-      // Create anchor and trigger download
+    if (!audioURL) {
+      toast.error("No audio to download");
+      return;
+    }
+
+    try {
       const a = document.createElement("a");
-      a.href = generatedAudioUrl;
-      a.download = `transformed_${fileName}`;
+      a.href = audioURL;
+      a.download = `orphia-${new Date().toISOString().slice(0, 10)}.wav`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
+      toast.info("Downloading audio...");
+    } catch (error) {
+      console.error("download error: ", error);
+      toast.error("An error occurred while downloading audio");
+    }
+  };
+
+  const handlePlayPause = () => {
+    if (!audioPlayer) {
+      toast.error("No audio to play");
+      return;
+    }
+
+    if (audioPlayer.paused) {
+      audioPlayer.play();
+    } else {
+      audioPlayer.pause();
     }
   };
 
@@ -301,7 +325,7 @@ export default function MusicGenPage() {
                       size="icon"
                       variant="ghost"
                       className="h-8 w-8 rounded-full"
-                      onClick={playGeneratedAudio}
+                      onClick={handlePlayPause}
                     >
                       <PlayCircle className="h-5 w-5 text-primary" />
                     </Button>
