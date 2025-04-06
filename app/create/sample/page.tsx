@@ -1,8 +1,6 @@
 "use client";
 
-import type React from "react";
-
-import { useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import {
   FileAudio,
   Info,
@@ -37,7 +35,7 @@ import { useConvexAuth } from "convex/react";
 import { Spinner } from "@/components/spinner";
 import { redirect } from "next/navigation";
 
-export default function SamplePage() {
+export default function MusicGenPage() {
   const { isAuthenticated, isLoading } = useConvexAuth();
 
   const [fileName, setFileName] = useState("");
@@ -55,8 +53,8 @@ export default function SamplePage() {
   const [transformationStyle, setTransformationStyle] = useState(50);
 
   // Audio player refs
-  const uploadedAudioRef = useRef<HTMLAudioElement>(null);
-  const generatedAudioRef = useRef<HTMLAudioElement>(null);
+  const uploadedAudioRef = useRef<HTMLAudioElement | null>(null);
+  const generatedAudioRef = useRef<HTMLAudioElement | null>(null);
 
   if (isLoading) {
     return (
@@ -98,31 +96,36 @@ export default function SamplePage() {
     setError("");
 
     try {
-      // Create form data to send the audio file and parameters
+      // Create form data to send to our Next.js API
       const formData = new FormData();
-      formData.append("audioFile", fileObj);
+      formData.append("audio", fileObj);
       formData.append("prompt", prompt);
       formData.append("duration", duration.toString());
       formData.append("sampleInfluence", sampleInfluence.toString());
       formData.append("transformationStyle", transformationStyle.toString());
 
       // Send to our API route
-      const response = await fetch("/api/generate-music", {
+      const response = await fetch("/api/sample", {
         method: "POST",
         body: formData,
       });
 
       if (!response.ok) {
-        throw new Error(`Error: ${response.statusText}`);
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to generate music");
       }
 
-      const data = await response.json();
+      // Get the audio blob from the response
+      const audioBlob = await response.blob();
 
-      // Set the URL to our generated audio file
-      setGeneratedAudioUrl(data.audioUrl);
+      // Create URL for the blob
+      const audioUrl = URL.createObjectURL(audioBlob);
+
+      // Set the generated audio URL
+      setGeneratedAudioUrl(audioUrl);
       setGeneratedMusic(true);
-    } catch (err: any) {
-      setError(err.message || "Failed to generate music");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to generate music");
       console.error("Error generating music:", err);
     } finally {
       setIsGenerating(false);

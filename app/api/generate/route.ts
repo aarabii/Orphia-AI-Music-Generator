@@ -77,7 +77,7 @@ export async function POST(request: Request) {
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer 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`,
+            Authorization: `Bearer hf_CbpHCAjihQRRTnrFYFgLympkjWqTogqcIXs`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
