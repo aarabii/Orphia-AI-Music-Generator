@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 // Debugging line to check if the token is set
+
+export const maxDuration = 60; // Maximum duration in seconds
+
 export async function POST(request: Request) {
   try {
     // Early token validation with more context
