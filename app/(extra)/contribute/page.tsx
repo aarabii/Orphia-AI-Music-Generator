@@ -36,7 +36,7 @@ export default function ContributePage() {
   const shareTitle = "Check out Orphia - AI-powered music generation!";
   const shareText =
     "I just discovered Orphia, an amazing AI tool that generates music from text prompts or audio samples. Check it out!";
-  const shareUrl = "https://orphia.com";
+  const shareUrl = "https://orphia.vercel.app";
 
   // Create share URLs
   const twitterShareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
@@ -84,12 +84,6 @@ export default function ContributePage() {
               title: "Contribute Code",
               description: "Help us improve the model or web application.",
               link: "https://github.com/aarabii/orphia-ai-music-generator/",
-            },
-            {
-              icon: <MessagesSquare className="h-8 w-8 text-primary" />,
-              title: "Join Discussions",
-              description: "Participate in our community discussions.",
-              link: "https://discord.gg/orphia",
             },
           ].map((item, index) => (
             <motion.div
