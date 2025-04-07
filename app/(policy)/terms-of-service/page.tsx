@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { FileText } from "lucide-react";
+import Link from "next/link";
 
 export default function TermsOfServicePage() {
   return (
@@ -173,7 +174,11 @@ export default function TermsOfServicePage() {
 
           <p>
             If you have any questions about these Terms, please contact us at
-            legal@orphia.com.
+            <span className="font-semibold text-accent">
+              <Link href={`mailto:aarab.nishchal@gmail.com`}>
+                aarab.nishchal@gmail.com.
+              </Link>
+            </span>
           </p>
         </div>
       </motion.div>

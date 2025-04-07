@@ -14,16 +14,17 @@ export const teamMembers = [
     description: "Can build a React app faster than making Maggi.",
     image: AarabImage.src,
     github: "https://github.com/aarabii/",
-    linkedin: "https://linkedin.com/aarab-nishchal/",
+    linkedin: "https://linkedin.com/in/aarab-nishchal/",
     mail: "aarab.nishchal@gmail.com",
   },
   {
     name: "Shivansh Rastogi",
     role: "Frontend Developer & Documentation Specialist",
-    description: "If it looks good, I did it. If it’s broken, it’s probably the backend.",
+    description:
+      "If it looks good, I did it. If it’s broken, it’s probably the backend.",
     image: ShivanshImage.src,
     github: "https://github.com/shivanshrastogi12",
-    linkedin: "https://linkedin.com",
+    linkedin: "https://www.linkedin.com/in/shivansh-rastogi12/",
     mail: "shivansh,rastogi1204@gmail.com",
   },
   {
@@ -32,13 +33,14 @@ export const teamMembers = [
     description: "Making things pretty while frontend developers cry.",
     image: TanishqImage.src,
     github: "https://github.com/tanishqmowar",
-    linkedin: "https://linkedin.com",
+    linkedin: "https://linkedin.com/in/tanishq-mowar",
     mail: "tanishqmowar@gmail.com",
   },
   {
     name: "Kumar Divyam",
     role: "Project Coordination & DevOps Specialist",
-    description: "My job is 10% planning and 90% reminding people about deadlines.",
+    description:
+      "My job is 10% planning and 90% reminding people about deadlines.",
     image: DivyamImage.src,
     github: "https://github.com/KumarDivyam19",
     linkedin: "https://linkedin.com",
@@ -50,7 +52,7 @@ export const teamMembers = [
     description: "Can turn ‘Hello World’ into a novel.",
     image: SriyansImage.src,
     github: "https://github.com/SriyansPanigrahi",
-    linkedin: "https://linkedin.com",
+    linkedin: "https://www.linkedin.com/in/sriyans-kumar-panigrahi-b7b6aa2b0/",
     mail: "sriyanspanigrahi17@gmail.com",
   },
   {

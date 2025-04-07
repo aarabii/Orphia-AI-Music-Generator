@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Shield } from "lucide-react";
+import Link from "next/link";
 
 export default function PrivacyPolicyPage() {
   return (
@@ -202,11 +203,12 @@ export default function PrivacyPolicyPage() {
 
           <p>
             If you have questions or concerns about this Privacy Policy, please
-            contact us at:
-          </p>
-
-          <p className="mt-4">
-            <strong>Email:</strong> aarab.nishchal@gmail.com
+            contact us at:{" "}
+            <span className="font-semibold text-accent">
+              <Link href={`mailto:aarab.nishchal@gmail.com`}>
+                aarab.nishchal@gmail.com.
+              </Link>
+            </span>
           </p>
         </div>
       </motion.div>

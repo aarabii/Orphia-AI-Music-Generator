@@ -12,6 +12,8 @@ import {
   Wand2,
   Zap,
   Download,
+  RefreshCw,
+  X,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -49,6 +51,7 @@ export default function MusicGenPage() {
   const [generatedMusic, setGeneratedMusic] = useState(false);
   const [generatedAudioUrl, setGeneratedAudioUrl] = useState("");
   const [error, setError] = useState("");
+  const [fileObjectUrl, setFileObjectUrl] = useState("");
 
   const [isPlayingOriginal, setIsPlayingOriginal] = useState(false);
   const [isPlayingGenerated, setIsPlayingGenerated] = useState(false);
@@ -59,6 +62,7 @@ export default function MusicGenPage() {
 
   const uploadedAudioRef = useRef<HTMLAudioElement | null>(null);
   const generatedAudioRef = useRef<HTMLAudioElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Clean up object URLs on unmount to prevent memory leaks
   useEffect(() => {
@@ -66,8 +70,11 @@ export default function MusicGenPage() {
       if (generatedAudioUrl) {
         URL.revokeObjectURL(generatedAudioUrl);
       }
+      if (fileObjectUrl) {
+        URL.revokeObjectURL(fileObjectUrl);
+      }
     };
-  }, [generatedAudioUrl]);
+  }, [generatedAudioUrl, fileObjectUrl]);
 
   // Set up audio event listeners
   useEffect(() => {
@@ -108,6 +115,19 @@ export default function MusicGenPage() {
         return;
       }
 
+      // Clean up previous file URL if it exists
+      if (fileObjectUrl) {
+        URL.revokeObjectURL(fileObjectUrl);
+      }
+
+      // Stop playing if audio was playing
+      if (isPlayingOriginal && uploadedAudioRef.current) {
+        uploadedAudioRef.current.pause();
+        setIsPlayingOriginal(false);
+      }
+
+      const newFileUrl = URL.createObjectURL(file);
+      setFileObjectUrl(newFileUrl);
       setFileName(file.name);
       setFileObj(file);
       setIsUploaded(true);
@@ -115,6 +135,36 @@ export default function MusicGenPage() {
       // Reset generated music when uploading a new file
       setGeneratedMusic(false);
       setGeneratedAudioUrl("");
+
+      // Reset the error state
+      setError("");
+
+      // Reset file input value to allow re-upload of the same file
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
+  const handleRemoveFile = () => {
+    // Clean up file URL
+    if (fileObjectUrl) {
+      URL.revokeObjectURL(fileObjectUrl);
+    }
+
+    // Reset all file-related states
+    setFileName("");
+    setFileObj(null);
+    setFileObjectUrl("");
+    setIsUploaded(false);
+    setGeneratedMusic(false);
+    setGeneratedAudioUrl("");
+    setError("");
+    setIsPlayingOriginal(false);
+
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
@@ -129,7 +179,10 @@ export default function MusicGenPage() {
         generatedAudioRef.current.pause();
         setIsPlayingGenerated(false);
       }
-      uploadedAudioRef.current.play();
+      uploadedAudioRef.current.play().catch((err) => {
+        console.error("Error playing audio:", err);
+        toast.error("Failed to play audio");
+      });
     }
     setIsPlayingOriginal(!isPlayingOriginal);
   };
@@ -145,7 +198,10 @@ export default function MusicGenPage() {
         uploadedAudioRef.current.pause();
         setIsPlayingOriginal(false);
       }
-      generatedAudioRef.current.play();
+      generatedAudioRef.current.play().catch((err) => {
+        console.error("Error playing generated audio:", err);
+        toast.error("Failed to play generated audio");
+      });
     }
     setIsPlayingGenerated(!isPlayingGenerated);
   };
@@ -188,6 +244,7 @@ export default function MusicGenPage() {
 
       setGeneratedAudioUrl(audioUrl);
       setGeneratedMusic(true);
+      toast.success("Music generation complete!");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to generate music");
       console.error("Error generating music:", err);
@@ -198,8 +255,17 @@ export default function MusicGenPage() {
   };
 
   const handleRegenerate = () => {
+    // Stop playing if audio was playing
+    if (isPlayingGenerated && generatedAudioRef.current) {
+      generatedAudioRef.current.pause();
+      setIsPlayingGenerated(false);
+    }
+
     setGeneratedMusic(false);
-    setGeneratedAudioUrl("");
+    if (generatedAudioUrl) {
+      URL.revokeObjectURL(generatedAudioUrl);
+      setGeneratedAudioUrl("");
+    }
     handleGenerate();
   };
 
@@ -265,6 +331,7 @@ export default function MusicGenPage() {
                     accept="audio/*"
                     className="hidden"
                     id="audio-upload"
+                    ref={fileInputRef}
                     onChange={handleFileChange}
                   />
                   <Button asChild variant="secondary" className="rounded-full">
@@ -277,29 +344,75 @@ export default function MusicGenPage() {
               ) : (
                 <div className="rounded-md border p-4 bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5">
                   <div className="flex justify-between items-center mb-4">
-                    <div>
-                      <h3 className="font-medium">{fileName}</h3>
+                    <div className="flex-1 mr-2">
+                      <h3 className="font-medium truncate">{fileName}</h3>
                       <p className="text-sm text-muted-foreground">
                         Uploaded just now
                       </p>
                     </div>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-8 w-8 rounded-full"
-                      onClick={togglePlayOriginalAudio}
-                    >
-                      {isPlayingOriginal ? (
-                        <PauseCircle className="h-5 w-5 text-primary" />
-                      ) : (
-                        <PlayCircle className="h-5 w-5 text-primary" />
-                      )}
-                    </Button>
-                    {fileObj && (
+                    <div className="flex items-center space-x-2">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              size="icon"
+                              variant="outline"
+                              className="h-8 w-8 rounded-full"
+                              onClick={() => {
+                                if (fileInputRef.current) {
+                                  fileInputRef.current.click();
+                                }
+                              }}
+                            >
+                              <RefreshCw className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="text-xs">Replace file</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              size="icon"
+                              variant="outline"
+                              className="h-8 w-8 rounded-full"
+                              onClick={handleRemoveFile}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="text-xs">Remove file</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8 rounded-full"
+                        onClick={togglePlayOriginalAudio}
+                      >
+                        {isPlayingOriginal ? (
+                          <PauseCircle className="h-5 w-5 text-primary" />
+                        ) : (
+                          <PlayCircle className="h-5 w-5 text-primary" />
+                        )}
+                      </Button>
+                    </div>
+                    {fileObjectUrl && (
                       <audio
                         ref={uploadedAudioRef}
-                        src={URL.createObjectURL(fileObj)}
+                        src={fileObjectUrl}
                         className="hidden"
+                        onError={(e) => {
+                          console.error("Audio error:", e);
+                          toast.error("Error loading audio file");
+                        }}
                       />
                     )}
                   </div>
@@ -322,6 +435,14 @@ export default function MusicGenPage() {
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
                     className="mt-4 border-primary/20 focus-visible:ring-primary"
+                  />
+
+                  <Input
+                    type="file"
+                    accept="audio/*"
+                    className="hidden"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
                   />
                 </div>
               )}
@@ -390,6 +511,10 @@ export default function MusicGenPage() {
                         ref={generatedAudioRef}
                         src={generatedAudioUrl}
                         className="hidden"
+                        onError={(e) => {
+                          console.error("Generated audio error:", e);
+                          toast.error("Error loading generated audio");
+                        }}
                       />
                     )}
                   </div>
@@ -402,6 +527,7 @@ export default function MusicGenPage() {
                           style={{
                             height: `${Math.sin(i * 0.5) * 30 + 40}%`,
                             opacity: i % 3 === 0 ? 0.8 : 0.4,
+                            animation: `pulse ${Math.random() * 1 + 0.5}s ease-in-out infinite`,
                           }}
                         />
                       ))}
@@ -423,7 +549,10 @@ export default function MusicGenPage() {
                       Regenerating...
                     </>
                   ) : (
-                    "Regenerate"
+                    <>
+                      <RefreshCw className="h-4 w-4 mr-1" />
+                      Regenerate
+                    </>
                   )}
                 </Button>
                 <Button

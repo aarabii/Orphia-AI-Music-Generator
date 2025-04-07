@@ -204,7 +204,11 @@ export default function TeamPage() {
                           <span className="sr-only">LinkedIn</span>
                         </Button>
                       </Link>
-                      <Link href={`mailto:${member.mail.toLowerCase()}`}>
+                      <Link
+                        href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(member.mail.toLowerCase())}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         <Button
                           size="icon"
                           variant="ghost"
