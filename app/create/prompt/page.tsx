@@ -309,12 +309,12 @@ export default function PromptPage() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label>Duration</Label>
-                  <span className="text-sm font-medium">{duration}</span>
+                  <span className="text-sm font-medium">{duration} sec.</span>
                 </div>
                 <Slider
                   value={[duration]}
                   onValueChange={(value) => setDuration(value[0])}
-                  max={120}
+                  max={60}
                   step={5}
                   className="[&>span]:bg-primary"
                 />
