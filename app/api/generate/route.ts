@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 // Debugging line to check if the token is set
 
-export const maxDuration = 60; // Maximum duration in seconds
+export const maxDuration = 60;
+const HF_KEY = process.env.HF_API_TOKEN;
 
 export async function POST(request: Request) {
   try {
     // Early token validation with more context
-    if (!process.env.HF_TOKEN) {
+    if (!HF_KEY) {
       console.error("CRITICAL: Hugging Face Token is not set");
       return NextResponse.json(
         {
@@ -77,7 +78,7 @@ export async function POST(request: Request) {
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer hf_CbpHCAjihQRRTnrFYFgLympkjWqTogqcIXs`,
+            Authorization: `Bearer ${HF_KEY}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({

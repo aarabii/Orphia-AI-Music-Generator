@@ -5,7 +5,7 @@ import { Readable } from "stream";
 // It's highly recommended to use environment variables for API keys
 // const HF_API_KEY = process.env.HUGGING_FACE_API_KEY;
 // Using the provided key directly for demonstration, replace in production
-const HF_API_KEY = "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"; // Replace with process.env.HUGGING_FACE_API_KEY
+const HF_API_KEY = process.env.HF_API_TOKEN; // Replace with process.env.HUGGING_FACE_API_KEY
 
 // Define a maximum allowed file size in bytes (e.g., 5MB)
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
