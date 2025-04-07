@@ -60,32 +60,27 @@ export default function PromptPage() {
   }
 
   const handleGenerate = async () => {
-    // Validate input
     if (prompt.trim().length === 0) {
-      toast.error("Please enter a prompt for music generation",);
+      toast.error("Please enter a prompt for music generation");
       return;
     }
 
-    // Reset previous state
     if (audioPlayer) {
       audioPlayer.pause();
     }
     setGeneratedMusic(false);
     setAudioURL("");
 
-    // Start generation
     setIsGenerating(true);
 
     try {
-      // Prepare generation parameters
       const generationParams = {
         prompt: prompt.trim(),
         duration: duration,
         creativity: creativity / 100,
-        complexity: complexity / 100
+        complexity: complexity / 100,
       };
 
-      // Make API call to generate music
       const response = await fetch("/api/generate", {
         method: "POST",
         headers: {
@@ -94,35 +89,28 @@ export default function PromptPage() {
         body: JSON.stringify(generationParams),
       });
 
-      // Enhanced error handling
       if (!response.ok) {
-        // Try to get more detailed error information
         let errorBody;
         try {
           errorBody = await response.json();
-          console.error('Detailed API Error:', {
+          console.error("Detailed API Error:", {
             status: response.status,
-            body: errorBody
+            body: errorBody,
           });
         } catch (parseError) {
-          console.error('Error parsing error response:', parseError);
+          console.error("Error parsing error response:", parseError);
           errorBody = await response.text();
         }
 
-        // Construct a more informative error message
         const errorMessage = `Music generation failed: ${response.status} ${JSON.stringify(errorBody)}`;
 
-        // Log the full error details
         console.error(errorMessage);
 
-        // Throw an error with detailed context
         throw new Error(errorMessage);
       }
 
-      // Process audio data
       const data = await response.arrayBuffer();
 
-      // Additional validation for audio data
       if (!data || data.byteLength === 0) {
         throw new Error("Received empty audio data");
       }
@@ -130,21 +118,16 @@ export default function PromptPage() {
       const blob = new Blob([data], { type: "audio/mpeg" });
       const url = URL.createObjectURL(blob);
 
-      // Update state
       setAudioURL(url);
       setGeneratedMusic(true);
 
-      // Prepare audio player
       const player = new Audio(url);
       setAudioPlayer(player);
 
-      // Show success toast
       toast.success("Your AI-generated music is ready!");
     } catch (error) {
-      // Comprehensive error logging
       console.error("Full music generation error:", error);
 
-      // Provide user-friendly error message
       toast.error(
         error instanceof Error
           ? `Error: ${error.message}`
@@ -173,7 +156,7 @@ export default function PromptPage() {
       console.error("download error: ", error);
       toast.error("An error occurred while downloading audio");
     }
-  }
+  };
 
   const handlePlayPause = () => {
     if (!audioPlayer) {
@@ -186,7 +169,7 @@ export default function PromptPage() {
     } else {
       audioPlayer.pause();
     }
-  }
+  };
 
   return (
     <div className="container py-8">

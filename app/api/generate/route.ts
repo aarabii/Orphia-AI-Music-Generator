@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
-// Debugging line to check if the token is set
 
 export const maxDuration = 60;
 const HF_KEY = process.env.HF_API_TOKEN;
 
 export async function POST(request: Request) {
   try {
-    // Early token validation with more context
     if (!HF_KEY) {
       console.error("CRITICAL: Hugging Face Token is not set");
       return NextResponse.json(
@@ -23,7 +21,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Attempt to parse request body with extra error handling
     let requestBody;
     try {
       requestBody = await request.json();
@@ -42,7 +39,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Destructure and validate request parameters
     const {
       prompt,
       duration = 30,
@@ -50,7 +46,6 @@ export async function POST(request: Request) {
       complexity = 0.3,
     } = requestBody;
 
-    // Validate prompt
     if (!prompt || typeof prompt !== "string" || prompt.trim() === "") {
       console.warn("VALIDATION ERROR: Invalid or missing prompt");
       return NextResponse.json(
@@ -71,7 +66,6 @@ export async function POST(request: Request) {
       complexity,
     });
 
-    // Attempt to call Hugging Face API
     try {
       const huggingFaceResponse = await fetch(
         "https://router.huggingface.co/hf-inference/models/facebook/musicgen-small",
@@ -83,12 +77,6 @@ export async function POST(request: Request) {
           },
           body: JSON.stringify({
             inputs: prompt,
-            // parameters: {
-            //     max_new_tokens: clampedDuration * 10,
-            //     temperature: creativity,
-            //     guidance_scale: complexity * 2,
-            //     do_sample: true,
-            // },
           }),
         }
       );
@@ -165,5 +153,4 @@ export async function POST(request: Request) {
   }
 }
 
-// Ensure dynamic rendering
 export const dynamic = "force-dynamic";

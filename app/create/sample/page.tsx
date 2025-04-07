@@ -1,15 +1,17 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   FileAudio,
   Info,
   Loader2,
   Music2,
   PlayCircle,
+  PauseCircle,
   Upload,
   Wand2,
   Zap,
+  Download,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -47,17 +49,42 @@ export default function MusicGenPage() {
   const [generatedMusic, setGeneratedMusic] = useState(false);
   const [generatedAudioUrl, setGeneratedAudioUrl] = useState("");
   const [error, setError] = useState("");
-  const [audioURL, setAudioURL] = useState("");
-  const [audioPlayer, setAudioPlayer] = useState<HTMLAudioElement | null>(null);
 
-  // Settings states
+  const [isPlayingOriginal, setIsPlayingOriginal] = useState(false);
+  const [isPlayingGenerated, setIsPlayingGenerated] = useState(false);
+
   const [duration, setDuration] = useState(30);
   const [sampleInfluence, setSampleInfluence] = useState(70);
   const [transformationStyle, setTransformationStyle] = useState(50);
 
-  // Audio player refs
   const uploadedAudioRef = useRef<HTMLAudioElement | null>(null);
   const generatedAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Clean up object URLs on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (generatedAudioUrl) {
+        URL.revokeObjectURL(generatedAudioUrl);
+      }
+    };
+  }, [generatedAudioUrl]);
+
+  // Set up audio event listeners
+  useEffect(() => {
+    const uploadedAudio = uploadedAudioRef.current;
+    const generatedAudio = generatedAudioRef.current;
+
+    const handleUploadedAudioEnd = () => setIsPlayingOriginal(false);
+    const handleGeneratedAudioEnd = () => setIsPlayingGenerated(false);
+
+    uploadedAudio?.addEventListener("ended", handleUploadedAudioEnd);
+    generatedAudio?.addEventListener("ended", handleGeneratedAudioEnd);
+
+    return () => {
+      uploadedAudio?.removeEventListener("ended", handleUploadedAudioEnd);
+      generatedAudio?.removeEventListener("ended", handleGeneratedAudioEnd);
+    };
+  }, [isUploaded, generatedMusic]);
 
   if (isLoading) {
     return (
@@ -74,32 +101,65 @@ export default function MusicGenPage() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+
+      // Check file size (10MB limit)
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error("File size exceeds 10MB limit");
+        return;
+      }
+
       setFileName(file.name);
       setFileObj(file);
       setIsUploaded(true);
+
+      // Reset generated music when uploading a new file
+      setGeneratedMusic(false);
+      setGeneratedAudioUrl("");
     }
   };
 
-  const playOriginalAudio = () => {
-    if (uploadedAudioRef.current) {
+  const togglePlayOriginalAudio = () => {
+    if (!uploadedAudioRef.current) return;
+
+    if (isPlayingOriginal) {
+      uploadedAudioRef.current.pause();
+    } else {
+      // Stop generated audio if playing
+      if (isPlayingGenerated && generatedAudioRef.current) {
+        generatedAudioRef.current.pause();
+        setIsPlayingGenerated(false);
+      }
       uploadedAudioRef.current.play();
     }
+    setIsPlayingOriginal(!isPlayingOriginal);
   };
 
-  const playGeneratedAudio = () => {
-    if (generatedAudioRef.current) {
+  const togglePlayGeneratedAudio = () => {
+    if (!generatedAudioRef.current) return;
+
+    if (isPlayingGenerated) {
+      generatedAudioRef.current.pause();
+    } else {
+      // Stop original audio if playing
+      if (isPlayingOriginal && uploadedAudioRef.current) {
+        uploadedAudioRef.current.pause();
+        setIsPlayingOriginal(false);
+      }
       generatedAudioRef.current.play();
     }
+    setIsPlayingGenerated(!isPlayingGenerated);
   };
 
   const handleGenerate = async () => {
-    if (!isUploaded || !fileObj) return;
+    if (!isUploaded || !fileObj) {
+      toast.error("Please upload an audio file first");
+      return;
+    }
 
     setIsGenerating(true);
     setError("");
 
     try {
-      // Create form data to send to our Next.js API
       const formData = new FormData();
       formData.append("audio", fileObj);
       formData.append("prompt", prompt);
@@ -107,7 +167,6 @@ export default function MusicGenPage() {
       formData.append("sampleInfluence", sampleInfluence.toString());
       formData.append("transformationStyle", transformationStyle.toString());
 
-      // Send to our API route
       const response = await fetch("/api/sample", {
         method: "POST",
         body: formData,
@@ -118,60 +177,49 @@ export default function MusicGenPage() {
         throw new Error(errorData.error || "Failed to generate music");
       }
 
-      // Get the audio blob from the response
       const audioBlob = await response.blob();
 
-      // Create URL for the blob
+      // Revoke previous URL to prevent memory leaks
+      if (generatedAudioUrl) {
+        URL.revokeObjectURL(generatedAudioUrl);
+      }
+
       const audioUrl = URL.createObjectURL(audioBlob);
 
-      // Set the generated audio URL
       setGeneratedAudioUrl(audioUrl);
       setGeneratedMusic(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to generate music");
       console.error("Error generating music:", err);
+      toast.error("Failed to generate music");
     } finally {
       setIsGenerating(false);
     }
   };
 
   const handleRegenerate = () => {
-    // Reset states to allow regeneration with the same file
     setGeneratedMusic(false);
     setGeneratedAudioUrl("");
     handleGenerate();
   };
 
   const handleDownload = () => {
-    if (!audioURL) {
+    if (!generatedAudioUrl) {
       toast.error("No audio to download");
       return;
     }
 
     try {
       const a = document.createElement("a");
-      a.href = audioURL;
+      a.href = generatedAudioUrl;
       a.download = `orphia-${new Date().toISOString().slice(0, 10)}.wav`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      toast.info("Downloading audio...");
+      toast.success("Downloading audio...");
     } catch (error) {
       console.error("download error: ", error);
       toast.error("An error occurred while downloading audio");
-    }
-  };
-
-  const handlePlayPause = () => {
-    if (!audioPlayer) {
-      toast.error("No audio to play");
-      return;
-    }
-
-    if (audioPlayer.paused) {
-      audioPlayer.play();
-    } else {
-      audioPlayer.pause();
     }
   };
 
@@ -239,9 +287,13 @@ export default function MusicGenPage() {
                       size="icon"
                       variant="ghost"
                       className="h-8 w-8 rounded-full"
-                      onClick={playOriginalAudio}
+                      onClick={togglePlayOriginalAudio}
                     >
-                      <PlayCircle className="h-5 w-5 text-primary" />
+                      {isPlayingOriginal ? (
+                        <PauseCircle className="h-5 w-5 text-primary" />
+                      ) : (
+                        <PlayCircle className="h-5 w-5 text-primary" />
+                      )}
                     </Button>
                     {fileObj && (
                       <audio
@@ -325,9 +377,13 @@ export default function MusicGenPage() {
                       size="icon"
                       variant="ghost"
                       className="h-8 w-8 rounded-full"
-                      onClick={handlePlayPause}
+                      onClick={togglePlayGeneratedAudio}
                     >
-                      <PlayCircle className="h-5 w-5 text-primary" />
+                      {isPlayingGenerated ? (
+                        <PauseCircle className="h-5 w-5 text-primary" />
+                      ) : (
+                        <PlayCircle className="h-5 w-5 text-primary" />
+                      )}
                     </Button>
                     {generatedAudioUrl && (
                       <audio
@@ -375,6 +431,7 @@ export default function MusicGenPage() {
                   className="rounded-full"
                   onClick={handleDownload}
                 >
+                  <Download className="h-4 w-4 mr-1" />
                   Download
                 </Button>
               </CardFooter>
